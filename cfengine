@@ -1,0 +1,9 @@
+#/bin/bash
+
+set -o xtrace
+
+cf-key
+cf-agent -B ${HOSTNAME}
+cf-agent -KI
+pkill cf-serverd 
+/var/cfengine/bin/cf-serverd --no-fork --verbose
