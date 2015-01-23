@@ -5,31 +5,34 @@ meta:
     am_policy_hub::
         "tags" slist => { "autorun" };
 
-commands:
-
-    StartSsh::
-
-        "/usr/sbin/dpkg-reconfigure openssh-server"
-             handle => "$(this.promise_filename)_$(this.namespace)_$(this.bundle)_$(this.promiser)";
-
-        "/etc/init.d/ssh start"
-             handle => "$(this.promise_filename)_$(this.namespace)_$(this.bundle)_$(this.promiser)";
-
-processes:
-
-    "sshd"
-        restart_class => "StartSsh";
-
 reports:
 
     inform_mode::
         "Bundle $(this.bundle) is running";
 
-packages:
+  methods:
+      "" usebundle => package_latest("openssh-server"),
+      handle => "$(this.promise_filename)_$(this.namespace)_$(this.bundlename)_apt_get_install_$(package)";
 
-    "openssh-server"
-        package_policy  => "addupdate",
-        package_method  => apt_get_permissive,
-        handle          => "$(this.promise_filename)_$(this.namespace)_$(this.bundlename)_apt_get_install_$(package)";
+      "" usebundle => autorun_ssh_cleanup,
+      handle => "$(this.promise_filename)_$(this.namespace)_$(this.bundlename)_cleanup_$(package)";
 
+}
+
+bundle agent autorun_ssh_cleanup
+{
+  commands:
+
+    StartSsh::
+
+      "/usr/sbin/dpkg-reconfigure openssh-server"
+      handle => "$(this.promise_filename)_$(this.namespace)_$(this.bundle)_$(this.promiser)";
+
+      "/etc/init.d/ssh start"
+      handle => "$(this.promise_filename)_$(this.namespace)_$(this.bundle)_$(this.promiser)";
+
+  processes:
+
+      "sshd"
+      restart_class => "StartSsh";
 }
