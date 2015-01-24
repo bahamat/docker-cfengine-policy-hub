@@ -2,8 +2,16 @@
 
 set -o xtrace
 
+if [ -z "${WITH_MASTERFILES}" ]; then
+    sed -i "/services_autorun/ s/!any/any/" /var/cfengine/masterfiles/def.cf
+fi
+
 cf-key
-cf-agent -B ${HOSTNAME}
+cf-agent -B $(hostname --ip-address)
 cf-agent -KI
-pkill cf-serverd 
-/var/cfengine/bin/cf-serverd --no-fork --verbose
+
+pkill cf-serverd
+pkill cf-execd
+
+/var/cfengine/bin/cf-execd --no-fork ${CF_FLAGS} &
+exec /var/cfengine/bin/cf-serverd --no-fork ${CF_FLAGS}
