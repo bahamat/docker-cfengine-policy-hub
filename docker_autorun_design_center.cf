@@ -1,0 +1,37 @@
+bundle agent autorun_design_center
+{
+  meta:
+    am_policy_hub::
+      "tags" slist => { "autorun" };
+
+  classes:
+      "have_activation_$(activations)" expression => "any";
+      "have_local_sketches" expression => fileexists($(local_sketch_index));
+
+  vars:
+      "local_sketch_index" string => "$(sys.workdir)/design-center/sketches/cfsketches.json";
+      "vardata_file" string => "$(sys.masterdir)/sketches/meta/vardata.conf";
+      "vardata" data => readjson($(vardata_file), 100k);
+      "activations" slist => getindices("vardata[activations]");
+
+      "pfile" string => "$(this.promise_filename).json";
+      "params" data => readjson($(pfile), 100k);
+
+      "sketches" slist => getindices(params);
+      "csketches[$(sketches)]" string => canonify($(sketches));
+
+  commands:
+      "$(sys.workdir)/design-center/bin/cf-sketch --expert --install $(sketches)"
+      ifvarclass => "!have_activation_$(csketches[$(sketches)]).!have_local_sketches";
+
+      "$(sys.workdir)/design-center/bin/cf-sketch --expert --installsource $(local_sketch_index) --install $(sketches)"
+      ifvarclass => "!have_activation_$(csketches[$(sketches)]).have_local_sketches";
+
+      "$(sys.workdir)/design-center/bin/cf-sketch --expert --activate $(sketches)=$(pfile) --generate"
+      ifvarclass => "!have_activation_$(csketches[$(sketches)])";
+
+  reports:
+    inform_mode::
+      "$(this.bundle): running";
+
+}
