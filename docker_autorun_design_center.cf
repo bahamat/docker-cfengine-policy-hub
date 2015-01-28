@@ -1,0 +1,32 @@
+bundle agent autorun_design_center
+{
+  meta:
+    am_policy_hub::
+      "tags" slist => { "autorun" };
+
+  classes:
+      "have_activation_$(activations)" expression => "any";
+
+  vars:
+      "vardata_file" string => "$(sys.masterdir)/sketches/meta/vardata.conf";
+      "vardata" data => readjson($(vardata_file), 100k);
+      "activations" slist => getindices("vardata[activations]");
+
+      "pfile" string => "$(this.promise_filename).json";
+      "params" data => readjson($(pfile), 100k);
+
+      "sketches" slist => getindices(params);
+      "csketches[$(sketches)]" string => canonify($(sketches));
+
+  commands:
+      "$(sys.workdir)/design-center/bin/cf-sketch --expert --install $(sketches)"
+      ifvarclass => "!have_activation_$(csketches[$(sketches)])";
+
+      "$(sys.workdir)/design-center/bin/cf-sketch --expert --activate $(sketches)=$(pfile) --generate"
+      ifvarclass => "!have_activation_$(csketches[$(sketches)])";
+
+  reports:
+    inform_mode::
+      "$(this.bundle): running";
+
+}

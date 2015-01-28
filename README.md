@@ -1,6 +1,8 @@
 This container sets up a cfengine policy-hub.
 
-The default policy set is included, and has autorun enabled. A supplemental policy is included to install `sshd`.
+The default policy set is included, and has autorun enabled.
+Supplemental policies are included to install `sshd` and to activate a
+Design Center sketch.
 
 When the container starts it will:
 
