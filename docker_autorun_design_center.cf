@@ -5,10 +5,12 @@ bundle agent autorun_design_center
       "tags" slist => { "autorun" };
 
   classes:
+    community_edition::
       "have_activation_$(activations)" expression => "any";
       "have_local_sketches" expression => fileexists($(local_sketch_index));
 
   vars:
+    community_edition::
       "local_sketch_index" string => "$(sys.workdir)/design-center/sketches/cfsketches.json";
       "vardata_file" string => "$(sys.masterdir)/sketches/meta/vardata.conf";
       "vardata" data => readjson($(vardata_file), 100k);
@@ -21,6 +23,7 @@ bundle agent autorun_design_center
       "csketches[$(sketches)]" string => canonify($(sketches));
 
   commands:
+    community_edition::
       "$(sys.workdir)/design-center/bin/cf-sketch --expert --install $(sketches)"
       ifvarclass => "!have_activation_$(csketches[$(sketches)]).!have_local_sketches";
 
@@ -33,5 +36,6 @@ bundle agent autorun_design_center
   reports:
     inform_mode::
       "$(this.bundle): running";
-
+    !community_edition::
+      "Please use the Enterprise Mission Portal to manage Design Center sketches.  This bundle will install in $(sys.masterdir) which in CFEngine Enterprise gets overwritten from your version control repository."
 }
