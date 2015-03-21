@@ -1,7 +1,8 @@
-# Version: 3.6.2-1
+# Version: 3.6.5-1
 FROM debian:7
 MAINTAINER Brian Bennett bahamat@digitalelf.net
 ENV DEBIAN_FRONTEND noninteractive
+ENV CFE_VERSION 3.6.5
 EXPOSE 5308
 EXPOSE 22
 RUN ["apt-get", "update"]
