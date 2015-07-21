@@ -8,19 +8,24 @@ bundle agent autorun_design_center
     community_edition::
       "have_activation_$(activations)" expression => "any";
       "have_local_sketches" expression => fileexists($(local_sketch_index));
+      "have_vardata_file" expression => fileexists($(vardata_file));
+      "have_vardata" expression => isvariable(vardata);
 
   vars:
     community_edition::
       "local_sketch_index" string => "$(sys.workdir)/design-center/sketches/cfsketches.json";
-      "vardata_file" string => "$(sys.masterdir)/sketches/meta/vardata.conf";
-      "vardata" data => readjson($(vardata_file), 100k);
-      "activations" slist => getindices("vardata[activations]");
-
       "pfile" string => "$(this.promise_filename).json";
       "params" data => readjson($(pfile), 100k);
 
       "sketches" slist => getindices(params);
       "csketches[$(sketches)]" string => canonify($(sketches));
+
+      "vardata_file" string => "$(sys.masterdir)/sketches/meta/vardata.conf";
+
+    have_vardata_file::
+      "vardata" data => readjson($(vardata_file), 100k);
+    have_vardata::
+      "activations" slist => getindices("vardata[activations]");
 
   commands:
     community_edition::
