@@ -5,9 +5,6 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV CFE_VERSION 3.6.5
 EXPOSE 5308
 EXPOSE 22
-VOLUME /var/cfengine/masterfiles
-VOLUME /var/cfengine/design-center/sketches
-VOLUME /var/cfengine/modules
 RUN ["apt-get", "update"]
 RUN ["apt-get", "dist-upgrade", "-y"]
 RUN ["apt-get", "install", "-y", "apt-utils"]
