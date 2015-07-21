@@ -37,5 +37,5 @@ bundle agent autorun_design_center
     inform_mode::
       "$(this.bundle): running";
     !community_edition::
-      "Please use the Enterprise Mission Portal to manage Design Center sketches.  This bundle will install in $(sys.masterdir) which in CFEngine Enterprise gets overwritten from your version control repository."
+      "Please use the Enterprise Mission Portal to manage Design Center sketches.  This bundle will install in $(sys.masterdir) which in CFEngine Enterprise gets overwritten from your version control repository.";
 }
