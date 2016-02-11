@@ -8,10 +8,14 @@ fi
 
 cf-key
 cf-agent -B $(hostname --ip-address)
-cf-agent -KI
 
-pkill cf-serverd
-pkill cf-execd
+if [ -z "${WITH_TESTFILES}" ]; then
+    cf-agent -KI
+    pkill cf-serverd
+    pkill cf-execd
 
-/var/cfengine/bin/cf-execd --no-fork ${CF_FLAGS} &
-exec /var/cfengine/bin/cf-serverd --no-fork ${CF_FLAGS}
+    /var/cfengine/bin/cf-execd --no-fork ${CF_FLAGS} &
+    exec /var/cfengine/bin/cf-serverd --no-fork ${CF_FLAGS}
+else
+    cf-agent -KI -f "${WITH_TESTFILES}/promises.cf"
+fi

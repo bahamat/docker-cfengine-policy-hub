@@ -20,6 +20,12 @@ policy to install sshd are not going to be used, since you're
 providing your own masterfiles. This is a very convenient way to test
 your own masterfiles.
 
+If you run `make run WITH_TESTFILES=/my/path/testfiles` then that path
+will be mounted under `/opt/local/lib/testfiles` and
+`/my/path/testfiles/promises.cf` will be executed from that mount.
+This is a very convenient way to test your own policies **without**
+overriding the masterfiles.
+
 If you run `make run WITH_SKETCHES=/my/path/design-center/sketches`
 then that path will be mounted under
 `/var/cfengine/design-center/sketches` so both the container and you

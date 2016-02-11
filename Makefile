@@ -2,13 +2,20 @@ CF_FLAGS=--verbose
 DOCKER=docker
 BUILDFLAGS=
 RUNFLAGS=
-VERSION=3.6.5-1
-OWNER=bahamat
+VERSION=3.8.1-1
+OWNER=tzz
+IMAGEBASE=cfengine
+IMAGENAME=$(OWNER)/$(IMAGEBASE)
 WITH_MASTERFILES=
 WITH_SKETCHES=
+WITH_TESTFILES=
 
 ifneq ($(WITH_MASTERFILES),)
-	RUNFLAGS:=$(RUNFLAGS) -e WITH_MASTERFILES=$(WITH_MASTERFILES) -v $(WITH_MASTERFILES):/var/cfengine/masterfiles
+	RUNFLAGS:=$(RUNFLAGS) -e WITH_MASTERFILES=/var/cfengine/masterfiles -v $(WITH_MASTERFILES):/var/cfengine/masterfiles
+endif
+
+ifneq ($(WITH_TESTFILES),)
+	RUNFLAGS:=$(RUNFLAGS) -e WITH_TESTFILES=/opt/local/lib/testfiles -v $(WITH_TESTFILES):/opt/local/lib/testfiles
 endif
 
 ifneq ($(WITH_SKETCHES),)
@@ -20,17 +27,23 @@ RUNFLAGS:=$(RUNFLAGS) -e CF_FLAGS=$(CF_FLAGS)
 all: build
 
 build:
-	docker build $(BUILDFLAGS) -t="$(OWNER)/cfengine:$(VERSION)" .
+	VERSION=$(VERSION) $(DOCKER) build $(BUILDFLAGS) -t="$(IMAGENAME):$(VERSION)" .
+
+build_as_latest: build
+	$(DOCKER) tag "$(IMAGENAME):$(VERSION)" "$(IMAGENAME):latest"
 
 run: build
-	docker run $(RUNFLAGS) "${OWNER}/cfengine:$(VERSION)"
+	$(DOCKER) run $(RUNFLAGS) "${OWNER}/$(IMAGEBASE):$(VERSION)"
 
 runv: build
-	docker run $(RUNFLAGS) -v `pwd`:/data "$(OWNER)/cfengine:$(VERSION)"
+	$(DOCKER) run $(RUNFLAGS) -v `pwd`:/data "$(IMAGENAME):$(VERSION)"
+
+tester: build
+	$(DOCKER) run $(RUNFLAGS) "${OWNER}/$(IMAGEBASE):$(VERSION)"
 
 kill:
-	docker kill `docker ps -q` || echo nothing to kill
-	docker rm -f `docker ps -a -q` || echo nothing to clean
+	$(DOCKER) kill `$(DOCKER) ps -q` || echo nothing to kill
+	$(DOCKER) rm -f `$(DOCKER) ps -a -q` || echo nothing to clean
 
 clean: kill
-	docker rmi "$(OWNER)/cfengine:$(VERSION)" || echo no image to remove
+	$(DOCKER) rmi "$(IMAGENAME):$(VERSION)" || echo no image to remove
