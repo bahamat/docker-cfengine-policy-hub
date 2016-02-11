@@ -1,13 +1,20 @@
 FROM debian:latest
 MAINTAINER Ted Zlatanov <tzz@lifelogs.com>, Brian Bennett <bahamat@digitalelf.net>
+
 ENV DEBIAN_FRONTEND noninteractive
 ENV CFE_VERSION 3.8.1-1
+
 EXPOSE 5308
 EXPOSE 22
+
 RUN ["apt-get", "update"]
 RUN ["apt-get", "dist-upgrade", "-y"]
 RUN ["apt-get", "install", "-y", "apt-utils", "apt-transport-https"]
 RUN ["apt-get", "install", "-y", "curl", "procps", "perl-modules", "openssh-server", "vim-nox", "whois", "libterm-readline-gnu-perl", "liblwp-protocol-https-perl"]
+RUN ["apt-get", "install", "-y", "git"]
+RUN /usr/bin/git config --global user.name "Root Tester"
+RUN /usr/bin/git config --global user.email root@cfepolicyhub.lan
+RUN ["apt-get", "install", "-y", "etckeeper"]
 RUN curl -s -L https://cfengine-package-repos.s3.amazonaws.com/pub/gpg.key | apt-key add -
 RUN echo "deb https://cfengine-package-repos.s3.amazonaws.com/pub/apt/packages stable main" > /etc/apt/sources.list.d/cfengine-community.list
 RUN ["apt-get", "update"]

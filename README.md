@@ -24,7 +24,15 @@ If you run `make run WITH_TESTFILES=/my/path/testfiles` then that path
 will be mounted under `/opt/local/lib/testfiles` and
 `/my/path/testfiles/promises.cf` will be executed from that mount.
 This is a very convenient way to test your own policies **without**
-overriding the masterfiles.
+overriding the masterfiles, and produces a log of the changes to `/etc`. As an example,
+
+```console
+% make build test WITH_TESTFILES=/my/path/testfiles
+```
+
+will run `/my/path/testfiles/promises.cf` and produce test logs,
+including filesystem diffs, in
+`/my/path/testfiles/testruns/2016-02-11-24:17:21/*.log`.
 
 If you run `make run WITH_SKETCHES=/my/path/design-center/sketches`
 then that path will be mounted under
