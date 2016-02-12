@@ -1,4 +1,11 @@
-This container sets up a cfengine policy-hub.
+This container sets up a cfengine policy-hub by building a Docker
+image and running it.
+
+You can override the default image owner with
+
+```console
+% make targets...here... OWNER=smoot
+```
 
 The default policy set is included, and has autorun enabled.
 Supplemental policies are included to install `sshd` and to activate a
