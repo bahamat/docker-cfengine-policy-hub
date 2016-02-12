@@ -4,6 +4,7 @@ MAINTAINER Ted Zlatanov <tzz@lifelogs.com>, Brian Bennett <bahamat@digitalelf.ne
 ENV DEBIAN_FRONTEND noninteractive
 ENV CFE_VERSION 3.8.1-1
 
+LABEL classification=cfengine-policy-hub
 EXPOSE 5308
 EXPOSE 22
 

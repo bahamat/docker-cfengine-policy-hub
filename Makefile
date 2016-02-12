@@ -54,8 +54,8 @@ test:
 	$(DOCKER) diff $(TESTERNAME) > $(TEST_LOGDIR)/filesystem.log
 
 kill:
-	$(DOCKER) kill `$(DOCKER) ps -q` || echo nothing to kill
-	$(DOCKER) rm -f `$(DOCKER) ps -a -q` || echo nothing to clean
+	$(DOCKER) kill `$(DOCKER) ps -q -f label=classification=cfengine-policy-hub` || echo nothing to kill
+	$(DOCKER) rm -f `$(DOCKER) ps -a -q -f label=classification=cfengine-policy-hub` || echo nothing to clean
 
 clean: kill
 	$(DOCKER) rmi "$(IMAGENAME):$(VERSION)" || echo no image to remove
