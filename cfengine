@@ -6,12 +6,24 @@ if [ -z "${WITH_MASTERFILES}" ]; then
     sed -i "/services_autorun/ s/!any/any/" /var/cfengine/masterfiles/def.cf
 fi
 
+/usr/bin/etckeeper commit -m "before CFEngine bootstrap"
+
 cf-key
 cf-agent -B $(hostname --ip-address)
-cf-agent -KI
 
-pkill cf-serverd
-pkill cf-execd
+if [ -z "${WITH_TESTFILES}" ]; then
+    cf-agent -KI
+    pkill cf-serverd
+    pkill cf-execd
 
-/var/cfengine/bin/cf-execd --no-fork ${CF_FLAGS} &
-exec /var/cfengine/bin/cf-serverd --no-fork ${CF_FLAGS}
+    /var/cfengine/bin/cf-execd --no-fork ${CF_FLAGS} &
+    exec /var/cfengine/bin/cf-serverd --no-fork ${CF_FLAGS}
+else
+    /usr/bin/etckeeper commit -m "before CFEngine test"
+    cf-agent -KI -f "${WITH_TESTFILES}/promises.cf"
+    /usr/bin/etckeeper commit -m "after CFEngine test"
+    if [ -n "${TEST_LOGDIR}" ]; then
+        cd /etc
+        /usr/bin/git log -p --reverse > "${TEST_LOGDIR}/etc.log"
+    fi
+fi
