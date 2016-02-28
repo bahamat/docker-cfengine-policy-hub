@@ -3,10 +3,12 @@
 set -o xtrace
 
 if [ -z "${WITH_MASTERFILES}" ]; then
-    sed -i "/services_autorun/ s/!any/any/" /var/cfengine/masterfiles/def.cf
+    sed -i '/services_autorun/ s/!any/any/' $(find /var/cfengine/masterfiles -name def.cf)
 fi
 
 /usr/bin/etckeeper commit -m "before CFEngine bootstrap"
+
+/etc/init.d/cfengine3 restart
 
 cf-key
 cf-agent -B $(hostname --ip-address)

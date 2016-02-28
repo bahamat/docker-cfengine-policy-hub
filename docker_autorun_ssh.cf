@@ -12,7 +12,7 @@ reports:
 
   methods:
       "" usebundle => package_latest("openssh-server"),
-      handle => "$(this.promise_filename)_$(this.namespace)_$(this.bundlename)_apt_get_install_$(package)";
+      handle => "$(this.promise_filename)_$(this.namespace)_$(this.bundlename)_install_$(package)";
 
       "" usebundle => autorun_ssh_cleanup,
       handle => "$(this.promise_filename)_$(this.namespace)_$(this.bundlename)_cleanup_$(package)";

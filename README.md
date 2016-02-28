@@ -1,10 +1,18 @@
 This container sets up a cfengine policy-hub by building a Docker
-image and running it.
+image and running it. The platform can be selected and defaults to the
+latest Debian.
 
 You can override the default image owner with
 
 ```console
 % make targets...here... OWNER=smoot
+```
+
+You can override the default platform (choices include `debian` and
+`fedora`) with
+
+```console
+% make targets...here... PLATFORM=fedora
 ```
 
 The default policy set is included, and has autorun enabled.
@@ -13,6 +21,7 @@ Design Center sketch.
 
 When the container starts it will:
 
+* install the necessary packages for its platform
 * generate keys if they don't already exist
 * bootstrap to itself
 * run `cf-agent`
@@ -39,7 +48,9 @@ overriding the masterfiles, and produces a log of the changes to `/etc`. As an e
 
 will run `/my/path/testfiles/promises.cf` and produce test logs,
 including filesystem diffs, in
-`/my/path/testfiles/testruns/2016-02-11-24:17:21/*.log`.
+`/my/path/testfiles/testruns/$PLATFORM/2016-02-11-24:17:21/*.log`. The
+`$PLATFORM` piece will be either `debian` (the default) or another
+platform as listed above.
 
 If you run `make run WITH_SKETCHES=/my/path/design-center/sketches`
 then that path will be mounted under
