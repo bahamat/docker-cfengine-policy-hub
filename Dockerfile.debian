@@ -2,9 +2,10 @@ FROM debian:latest
 MAINTAINER Ted Zlatanov <tzz@lifelogs.com>, Brian Bennett <bahamat@digitalelf.net>
 
 ENV DEBIAN_FRONTEND noninteractive
-ENV CFE_VERSION 3.8.1-1
+ENV CFE_VERSION 3.8.1
 
 LABEL classification=cfengine-policy-hub
+LABEL platform=debian
 EXPOSE 5308
 EXPOSE 22
 
@@ -15,11 +16,12 @@ RUN ["apt-get", "install", "-y", "curl", "procps", "perl-modules", "openssh-serv
 RUN ["apt-get", "install", "-y", "git"]
 RUN /usr/bin/git config --global user.name "Root Tester"
 RUN /usr/bin/git config --global user.email root@cfepolicyhub.lan
-RUN ["apt-get", "install", "-y", "etckeeper"]
+RUN ["apt-get", "install", "-y", "etckeeper", "hostname"]
+RUN etckeeper init
 RUN curl -s -L https://cfengine-package-repos.s3.amazonaws.com/pub/gpg.key | apt-key add -
 RUN echo "deb https://cfengine-package-repos.s3.amazonaws.com/pub/apt/packages stable main" > /etc/apt/sources.list.d/cfengine-community.list
 RUN ["apt-get", "update"]
-RUN apt-get install -y cfengine-community=$CFE_VERSION
+RUN apt-get install -y cfengine-community=$CFE_VERSION-1
 RUN rm -f /etc/ssh/ssh_host*key*
 RUN rm -f /var/cfengine/ppkeys/*
 RUN #(nop) invalidate from here.......

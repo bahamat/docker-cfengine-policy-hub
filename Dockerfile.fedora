@@ -1,0 +1,37 @@
+# Fedora 23 tested
+FROM fedora:latest
+MAINTAINER Ted Zlatanov <tzz@lifelogs.com>, Brian Bennett <bahamat@digitalelf.net>
+
+ENV CFE_VERSION 3.8.1
+
+LABEL classification=cfengine-policy-hub
+LABEL platform=fedora
+EXPOSE 5308
+EXPOSE 22
+
+RUN ["dnf", "update", "-y"]
+RUN ["dnf", "install", "-y", "curl", "openssh-server", "vim-enhanced", "whois", "procps" ]
+RUN mkdir /var/run/sshd
+RUN sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN ["dnf", "install", "-y", "git"]
+RUN /usr/bin/git config --global user.name "Root Tester"
+RUN /usr/bin/git config --global user.email root@cfepolicyhub.lan
+RUN ["dnf", "install", "-y", "etckeeper", "hostname", "findutils"]
+RUN etckeeper init
+RUN rpm --import https://cfengine-package-repos.s3.amazonaws.com/pub/gpg.key
+ADD fedora/cfengine-community.repo /etc/yum.repos.d/cfengine-community.repo
+RUN ["dnf", "update", "-y"]
+# Perl Data::Dumper is required
+RUN dnf install -y cfengine-community-$CFE_VERSION perl-Data-Dumper
+RUN rm -f /etc/ssh/ssh_host*key*
+RUN rm -f /var/cfengine/ppkeys/*
+RUN #(nop) invalidate from here.......
+ADD cfengine /opt/local/bin/
+# On Fedora 23, the SSH autorun doesn't work well, and we should use `docker exec` anyhow (more secure)
+# ADD docker_autorun_ssh.cf /var/cfengine/masterfiles/services/autorun/docker_autorun_ssh.cf
+ADD docker_autorun_design_center.cf /var/cfengine/masterfiles/services/autorun/docker_autorun_design_center.cf
+ADD docker_autorun_design_center.cf.json /var/cfengine/masterfiles/services/autorun/docker_autorun_design_center.cf.json
+RUN echo 'root:toor' | chpasswd
+RUN #(nop) Change it after logging in
+RUN #(nop) Root password is 'toor'
+CMD /opt/local/bin/cfengine
